@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
     if (!file) {
       throw new Error("No file to upload");
     }
+
     const storageRef = ref(storage, `${user.id}/${file.name}_${randomUUID()}`);
     const res = await uploadBytes(storageRef, file as File, { contentType: "application/pdf" });
     const url = await getDownloadURL(storageRef);

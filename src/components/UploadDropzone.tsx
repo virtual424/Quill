@@ -6,7 +6,7 @@ import { Progress } from "./ui/progress";
 import { trpc } from "@/app/_trpc/client";
 import { useToast } from "./ui/use-toast";
 
-export default function UploadDropzone() {
+export default function UploadDropzone({ isSubscribed }: { isSubscribed: boolean }) {
   const router = useRouter();
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
@@ -53,6 +53,21 @@ export default function UploadDropzone() {
   const onDropHandler = async (acceptedFiles: any) => {
     setIsUploading(true);
     const progressInterval = startSimulatedProgress();
+    const file: File = acceptedFiles[0];
+    const fileSize = file.size / (1024 * 1024);
+    if (!isSubscribed && fileSize > 4) {
+      return toast({
+        title: "File size exceeded.",
+        description: "Free plan only supports file size upto 4MB. Please upgrade to upload bigger files.",
+        variant: "destructive",
+      });
+    } else if (isSubscribed && fileSize > 16) {
+      return toast({
+        title: "File size exceeded.",
+        description: "Pro plan only supports file size upto 16MB.",
+        variant: "destructive",
+      });
+    }
     const formData = new FormData();
     formData.append("file", acceptedFiles[0]);
     const response = await fetch("/api/upload", {
@@ -79,7 +94,7 @@ export default function UploadDropzone() {
                 <p className="mb-2 text-sm text-zinc-700">
                   <span className="font-semibold">Click to upload</span> or drag and drop
                 </p>
-                <p className="text-xs text-zinc-500">PDF (up to {"4"}MB)</p>
+                <p className="text-xs text-zinc-500">PDF (up to {isSubscribed ? "16" : "4"}MB)</p>
               </div>
 
               {acceptedFiles && acceptedFiles[0] ? (

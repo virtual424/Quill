@@ -111,6 +111,25 @@ export const appRouter = router({
         const loader = new PDFLoader(blob);
         const pageLevelDocs = await loader.load();
         const pagesAmt = pageLevelDocs.length;
+
+        const {
+          subscriptionPlan: { isSubscribed },
+        } = ctx;
+
+        const isProExcedded = pagesAmt > PLANS.find((plan) => plan.name === "Pro")!.pagesPerPdf;
+        const isFreeExcedded = pagesAmt > PLANS.find((plan) => plan.name === "Free")!.pagesPerPdf;
+
+        if ((isSubscribed && isProExcedded) || (!isSubscribed && isFreeExcedded)) {
+          await db.file.update({
+            data: {
+              uploadStatus: "FAILED",
+            },
+            where: {
+              id: createdFile.id,
+            },
+          });
+        }
+
         const pineconeIndex = pinecone.Index("quill");
 
         const embeddings = new VoyageEmbeddings({

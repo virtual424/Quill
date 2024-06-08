@@ -1,3 +1,4 @@
+import { getUserSubscriptionPlan } from "@/lib/stripe";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { TRPCError, initTRPC } from "@trpc/server";
 
@@ -12,9 +13,12 @@ const isAuth = middleware(async (opts) => {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
+  const subscriptionPlan = await getUserSubscriptionPlan();
+
   return opts.next({
     ctx: {
       userId: user.id,
+      subscriptionPlan,
       user,
     },
   });
