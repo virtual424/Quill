@@ -20,7 +20,7 @@ export default function UploadButton({ isSubscribed }: { isSubscribed: boolean }
         <Button>Upload PDF</Button>
       </DialogTrigger>
       <DialogContent>
-        <UploadDropzone isSubscribed={isSubscribed} />
+        <UploadDropzone isSubscribed={isSubscribed} setModalOpen={setIsOpen} />
       </DialogContent>
     </Dialog>
   );

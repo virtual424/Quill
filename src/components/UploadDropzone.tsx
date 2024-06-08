@@ -6,7 +6,13 @@ import { Progress } from "./ui/progress";
 import { trpc } from "@/app/_trpc/client";
 import { useToast } from "./ui/use-toast";
 
-export default function UploadDropzone({ isSubscribed }: { isSubscribed: boolean }) {
+export default function UploadDropzone({
+  isSubscribed,
+  setModalOpen,
+}: {
+  isSubscribed: boolean;
+  setModalOpen: (visible: boolean) => void;
+}) {
   const router = useRouter();
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
@@ -18,7 +24,6 @@ export default function UploadDropzone({ isSubscribed }: { isSubscribed: boolean
       setUploadProgress((prevProgress) => {
         if (prevProgress >= 95) {
           clearInterval(interval);
-          console.log(prevProgress);
           return prevProgress;
         }
 
@@ -31,6 +36,7 @@ export default function UploadDropzone({ isSubscribed }: { isSubscribed: boolean
 
   const { mutate: startPolling } = trpc.getFile.useMutation({
     onSuccess: (file) => {
+      console.log("file", file);
       router.push(`/dashboard/${file.id}`);
     },
     retry: true,
@@ -56,12 +62,16 @@ export default function UploadDropzone({ isSubscribed }: { isSubscribed: boolean
     const file: File = acceptedFiles[0];
     const fileSize = file.size / (1024 * 1024);
     if (!isSubscribed && fileSize > 4) {
+      setModalOpen(false);
+      clearInterval(progressInterval);
       return toast({
         title: "File size exceeded.",
         description: "Free plan only supports file size upto 4MB. Please upgrade to upload bigger files.",
         variant: "destructive",
       });
     } else if (isSubscribed && fileSize > 16) {
+      setModalOpen(false);
+      clearInterval(progressInterval);
       return toast({
         title: "File size exceeded.",
         description: "Pro plan only supports file size upto 16MB.",

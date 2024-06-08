@@ -9,21 +9,13 @@ export default function AuthCallback() {
   const searchParams = useSearchParams();
   const origin = searchParams.get("origin");
 
-  const {
-    data: response,
-    isSuccess,
-    isError,
-    error,
-  } = trpc.authCallback.useQuery(undefined, {
-    retry: true,
-    retryDelay: 500,
-  });
+  const { isError, error, isSuccess, status } = trpc.authCallback.useQuery();
 
   if (isError && error.data?.code === "UNAUTHORIZED") {
     router.push("/sign-in");
   }
 
-  if (isSuccess && response.success) {
+  if (isSuccess) {
     router.push(origin ? `/${origin}` : "/dashboard");
   }
 

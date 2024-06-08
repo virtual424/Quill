@@ -7,6 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 export function absoluteUrl(path: string) {
   if (typeof window !== "undefined") return path;
+  console.log(process.env);
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}${path}`;
   return `http://localhost:${process.env.PORT ?? 3000}${path}`;
 }
@@ -41,10 +42,10 @@ export function constructMetadata({
       title,
       description,
       images: [image],
-      creator: "@joshtriedcoding",
+      creator: "@hardik",
     },
     icons,
-    metadataBase: new URL("https://quill-jet.vercel.app"),
+    metadataBase: new URL("https://quill-five-mu.vercel.app"),
     ...(noIndex && {
       robots: {
         index: false,

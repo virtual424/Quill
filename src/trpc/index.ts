@@ -26,7 +26,7 @@ export const appRouter = router({
     const user = await getUser();
 
     if (!user || !user.id || !user.email) {
-      throw new TRPCError({ code: "BAD_REQUEST" });
+      throw new TRPCError({ code: "UNAUTHORIZED" });
     }
 
     const dbUser = await db.user.findFirst({
@@ -44,7 +44,6 @@ export const appRouter = router({
         },
       });
     }
-
     return { success: true };
   }),
   getUserFiles: privateProcedure.query(async ({ ctx }) => {
@@ -223,6 +222,7 @@ export const appRouter = router({
   createStripeSession: privateProcedure.mutation(async ({ ctx }) => {
     const { userId } = ctx;
     const billingUrl = absoluteUrl("/dashboard/billing");
+    console.log(billingUrl);
     if (!userId) throw new TRPCError({ code: "UNAUTHORIZED" });
     const dbUser = await db.user.findFirst({
       where: {
