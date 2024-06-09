@@ -19,12 +19,13 @@ export async function POST(request: NextRequest) {
     if (!file) {
       throw new Error("No file to upload");
     }
+    const storeName = `${file.name}_${randomUUID()}`;
 
-    const storageRef = ref(storage, `${user.id}/${file.name}_${randomUUID()}`);
+    const storageRef = ref(storage, `${user.id}/${storeName}`);
     const res = await uploadBytes(storageRef, file as File, { contentType: "application/pdf" });
     const url = await getDownloadURL(storageRef);
 
-    return NextResponse.json({ key: res.metadata.md5Hash, url, fileName: file.name });
+    return NextResponse.json({ key: res.metadata.md5Hash, url, fileName: file.name, storeName });
   } catch (e: any) {
     return NextResponse.json({ message: e.message });
   }

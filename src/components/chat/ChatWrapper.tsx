@@ -24,8 +24,6 @@ export default function ChatWrapper({ fileId, isSubscribed }: ChatWrapperProps) 
     }
   );
 
-  console.log(data);
-
   if (isPending)
     return (
       <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
@@ -56,7 +54,8 @@ export default function ChatWrapper({ fileId, isSubscribed }: ChatWrapperProps) 
       </div>
     );
 
-  if (data?.status === "FAILED")
+  if (data?.status === "FAILED") {
+    console.log("FAILED");
     return (
       <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
         <div className="flex-1 flex justify-center items-center flex-col mb-28">
@@ -84,6 +83,7 @@ export default function ChatWrapper({ fileId, isSubscribed }: ChatWrapperProps) 
         <ChatInput isDisabled />
       </div>
     );
+  }
 
   return (
     <ChatContextProvider fileId={fileId}>

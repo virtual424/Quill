@@ -86,20 +86,21 @@ export const appRouter = router({
       },
     });
 
-    const storageRef = ref(storage, `${ctx.userId}/${file.name}`);
+    const storageRef = ref(storage, `${ctx.userId}/${file.storeName}`);
     await deleteObject(storageRef);
 
     return file;
   }),
   saveFile: privateProcedure
-    .input(z.object({ key: z.string(), fileName: z.string(), url: z.string() }))
-    .mutation(async ({ ctx, input: { key, fileName, url } }) => {
+    .input(z.object({ key: z.string(), fileName: z.string(), url: z.string(), storeName: z.string() }))
+    .mutation(async ({ ctx, input: { key, fileName, url, storeName } }) => {
       const createdFile = await db.file.create({
         data: {
           key,
           name: fileName,
           userId: ctx.userId,
           url,
+          storeName,
           uploadStatus: "PROCESSING",
         },
       });
@@ -127,6 +128,7 @@ export const appRouter = router({
               id: createdFile.id,
             },
           });
+          return createdFile.key;
         }
 
         const pineconeIndex = pinecone.Index("quill");
@@ -151,7 +153,6 @@ export const appRouter = router({
         });
         return createdFile.key;
       } catch (e) {
-        console.log(e);
         await db.file.update({
           data: {
             uploadStatus: "FAILED",

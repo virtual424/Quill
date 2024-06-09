@@ -36,7 +36,7 @@ export default function UploadDropzone({
 
   const { mutate: startPolling } = trpc.getFile.useMutation({
     onSuccess: (file) => {
-      console.log("file", file);
+      console.log(file);
       router.push(`/dashboard/${file.id}`);
     },
     retry: true,
@@ -84,20 +84,21 @@ export default function UploadDropzone({
       method: "POST",
       body: formData,
     });
-    const { fileName, key, url } = await response.json();
-    saveFile({ fileName, key, url });
+    const { fileName, key, url, storeName } = await response.json();
+    saveFile({ fileName, key, url, storeName });
     clearInterval(progressInterval);
     setUploadProgress(100);
   };
 
   return (
-    <Dropzone multiple={false} onDrop={onDropHandler}>
+    <Dropzone multiple={false} onDropAccepted={onDropHandler}>
       {({ getRootProps, getInputProps, acceptedFiles }) => (
         <div {...getRootProps()} className="border h-64 m-4 border-dashed border-gray-300 rounded-lg">
           <div className="flex items-center justify-center h-full w-full">
             <label
               htmlFor="dropzone-file"
               className="flex flex-col items-center justify-center w-full h-full rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <Cloud className="h-6 w-6 text-zinc-500 mb-2" />
